@@ -51,7 +51,6 @@
       </ul>
     </li>
     <li><a href="#project-structure">Project Structure</a></li>
-    <li><a href="#contributing">Contributing</a></li>
   </ol>
 </details>
 

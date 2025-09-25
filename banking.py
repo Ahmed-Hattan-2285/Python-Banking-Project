@@ -64,51 +64,51 @@ class BankingMenu:
     def view_account_info(self):
         print(colored("\nACCOUNT INFORMATION",'blue'))
         print(colored("-" * 30, 'yellow'))
-        print(f"Customer ID: {self.current_customer.cust_id}")
-        print(f"Name: {self.current_customer.first_name} {self.current_customer.last_name}")
-        print(f"Checking Account: {'Yes' if self.current_customer.has_checking else 'No'}")
+        print(colored(f"Customer ID: {self.current_customer.cust_id}", 'blue'))
+        print(colored(f"Name: {self.current_customer.first_name} {self.current_customer.last_name}", 'blue'))
+        print(colored(f"Checking Account: {'Yes' if self.current_customer.has_checking else 'No'}", 'blue'))
         if self.current_customer.has_checking:
-            print(f"  Balance: ${self.current_customer.checking_balance:.2f}")
-        print(f"Savings Account: {'Yes' if self.current_customer.has_savings else 'No'}")
+            print(colored(f"  Balance: ${self.current_customer.checking_balance:.2f}", 'green'))
+        print(colored(f"Savings Account: {'Yes' if self.current_customer.has_savings else 'No'}", 'blue'))
         if self.current_customer.has_savings:
-            print(f"  Balance: ${self.current_customer.savings_balance:.2f}")
-        print(f"Account Status: {'Active' if self.current_customer.active else 'Inactive'}")
-        print(f"Overdraft Count: {self.current_customer.overdraft_count}")
+            print(colored(f"  Balance: ${self.current_customer.savings_balance:.2f}", 'green'))
+        print(colored(f"Account Status: {'Active' if self.current_customer.active else 'Inactive'}", 'green'))
+        print(colored(f"Overdraft Count: {self.current_customer.overdraft_count}", 'red'))
     
     def add_checking_account(self):
-        print("\nADD CHECKING ACCOUNT")
+        print(colored("\nADD CHECKING ACCOUNT",'magenta'))
         
         if self.current_customer.has_checking:
-            print("You already have a checking account.")
+            print(colored("You already have a checking account.", 'red'))
             return
         
         self.current_customer.add_checking_account()
         self.bank.save_customers()
-        print("Checking account added successfully!")
+        print(colored("Checking account added successfully!", 'green'))
     
     def add_savings_account(self):
-        print("\nADD SAVINGS ACCOUNT")
+        print(colored("\nADD SAVINGS ACCOUNT",'magenta'))
         
         if self.current_customer.has_savings:
-            print("You already have a savings account.")
+            print(colored("You already have a savings account.", 'red'))
             return
         
         self.current_customer.add_savings_account()
         self.bank.save_customers()
-        print("Savings account added successfully!")
+        print(colored("Savings account added successfully!", 'green'))
     
     def withdraw_money(self):
-        print("\nWITHDRAW MONEY")
+        print(colored("\nWITHDRAW MONEY",'magenta'))
         
         if not self.current_customer.has_checking and not self.current_customer.has_savings:
-            print("No accounts available for withdrawal.")
+            print(colored("No accounts available for withdrawal.", 'red'))
             return
         
-        print("\nSelect account to withdraw from:")
+        print(colored("\nSelect account to withdraw from:",'magenta'))
         if self.current_customer.has_checking:
-            print(f"1. Checking Account (Balance: ${self.current_customer.checking_balance:.2f})")
+            print(colored(f"1. Checking Account (Balance: ${self.current_customer.checking_balance:.2f})",'green'))
         if self.current_customer.has_savings:
-            print(f"2. Savings Account (Balance: ${self.current_customer.savings_balance:.2f})")
+            print(colored(f"2. Savings Account (Balance: ${self.current_customer.savings_balance:.2f})",'green'))
         
         ch = input(colored("Enter choice (1-2): ",'magenta')).strip()
         
@@ -132,81 +132,81 @@ class BankingMenu:
             if success:
                 self.bank.save_customers()
         else:
-            print("Invalid choice.")
+            print(colored("Invalid choice.", 'red'))
     
     def deposit_money(self):
-        print("\nDEPOSIT MONEY")
+        print(colored("\nDEPOSIT MONEY",'magenta'))
         
         if not self.current_customer.has_checking and not self.current_customer.has_savings:
-            print("No accounts available for deposit.")
+            print(colored("No accounts available for deposit.", 'red'))
             return
         
-        print("\nSelect account to deposit to:")
+        print(colored("\nSelect account to deposit to:",'magenta'))
         if self.current_customer.has_checking:
-            print(f"1. Checking Account (Balance: ${self.current_customer.checking_balance:.2f})")
+            print(colored(f"1. Checking Account (Balance: ${self.current_customer.checking_balance:.2f})",'green'))
         if self.current_customer.has_savings:
-            print(f"2. Savings Account (Balance: ${self.current_customer.savings_balance:.2f})")
+            print(colored(f"2. Savings Account (Balance: ${self.current_customer.savings_balance:.2f})",'green'))
         
-        ch = input("Enter choice (1-2): ").strip()
+        ch = input(colored("Enter choice (1-2): ", 'magenta')).strip()
         
         try:
-            amount = float(input("Enter amount to deposit: $"))
+            amount = float(input(colored("Enter amount to deposit: $", 'green')))
             if amount <= 0:
-                print("Amount must be positive.")
+                print(colored("Amount must be positive.", 'red'))
                 return
         except ValueError:
-            print("Invalid amount. Please enter a number.")
+            print(colored("Invalid amount. Please enter a number.", 'red'))
             return
         
         if ch == '1' and self.current_customer.has_checking:
             success = self.current_customer.deposit_to_checking(amount)
             if success:
-                print("Deposit successful!")
+                print(colored("Deposit successful!", 'green'))
                 self.bank.save_customers()
             else:
-                print("Deposit failed.")
+                print(colored("Deposit failed.", 'red'))
         elif ch == '2' and self.current_customer.has_savings:
             success = self.current_customer.deposit_to_savings(amount)
             if success:
-                print("Deposit successful!")
+                print(colored("Deposit successful!", 'green'))
                 self.bank.save_customers()
             else:
-                print("Deposit failed.")
+                print(colored("Deposit failed.", 'red'))
         else:
-            print("Invalid choice.")
+            print(colored("Invalid choice.", 'red'))
     
     def transfer_money(self):
-        print("\nTRANSFER MONEY")
-        print("1. Transfer between your own accounts")
-        print("2. Transfer to another customer")
+        print(colored("\nTRANSFER MONEY",'magenta'))
+        print(colored("1. Transfer between your own accounts",'green'))
+        print(colored("2. Transfer to another customer",'green'))
         
-        ch = input("Enter choice (1-2): ").strip()
+        ch = input(colored("Enter choice (1-2): ", 'magenta')).strip()
         
         if ch == '1':
             self.internal_transfer()
         elif ch == '2':
             self.external_transfer()
         else:
-            print("Invalid choice.")
+            print(colored("Invalid choice.", 'red'))
     
     def internal_transfer(self):
         if not self.current_customer.has_checking or not self.current_customer.has_savings:
-            print("You need both checking and savings accounts to transfer between them.")
+            print(colored("You need both checking and savings accounts to transfer between them.", 'red'))
             return
         
-        print("\nSelect transfer direction:")
-        print(f"1. Savings to Checking (Savings Balance: ${self.current_customer.savings_balance:.2f})")
-        print(f"2. Checking to Savings (Checking Balance: ${self.current_customer.checking_balance:.2f})")
+        print(colored("\nSelect transfer direction:",'magenta'))
+        print(colored(f"1. Savings to Checking (Savings Balance: ${self.current_customer.savings_balance:.2f})",'green'))
+        print(colored(f"2. Checking to Savings (Checking Balance: ${self.current_customer.checking_balance:.2f})",'green'))
         
-        ch = input("Enter choice (1-2): ").strip()
+        ch = input(colored("Enter choice (1-2): ", 'magenta')).strip()
         
         try:
-            amount = float(input("Enter amount to transfer: $"))
+            amount = float(input(colored("Enter amount to transfer: $", 'green')))
             if amount <= 0:
-                print("Amount must be positive.")
+                print(colored("Amount must be positive.", 'red'))
                 return
         except ValueError:
-            print("Invalid amount. Please enter a number.")
+            print(colored("Invalid amount. Please enter a number.", 'red'))
             return
         
         if ch == '1':
@@ -220,75 +220,75 @@ class BankingMenu:
             if success:
                 self.bank.save_customers()
         else:
-            print("Invalid choice.")
+            print(colored("Invalid choice.", 'red'))
     
     def external_transfer(self):
         if not self.current_customer.has_checking and not self.current_customer.has_savings:
-            print("No accounts available for transfer.")
+            print(colored("No accounts available for transfer.", 'red'))
             return
         
-        receiver_id = input("Enter receiver's Customer ID: ").strip()
+        receiver_id = input(colored("Enter receiver's Customer ID: ", 'magenta')).strip()
         receiver = self.bank.get_customer(receiver_id)
         
         if not receiver:
-            print("Receiver customer not found.")
+            print(colored("Receiver customer not found.", 'red'))
             return
         
         if not receiver.active:
-            print("Receiver account is deactivated.")
+            print(colored("Receiver account is deactivated.", 'red'))
             return
         
-        print("\nSelect your account to transfer from:")
+        print(colored("\nSelect your account to transfer from:",'magenta'))
         sender_account = None
         if self.current_customer.has_checking:
-            print(f"1. Checking Account (Balance: ${self.current_customer.checking_balance:.2f})")
+            print(colored(f"1. Checking Account (Balance: ${self.current_customer.checking_balance:.2f})",'green'))
         if self.current_customer.has_savings:
-            print(f"2. Savings Account (Balance: ${self.current_customer.savings_balance:.2f})")
+            print(colored(f"2. Savings Account (Balance: ${self.current_customer.savings_balance:.2f})",'green'))
         
-        ch = input("Enter choice (1-2): ").strip()
+        ch = input(colored("Enter choice (1-2): ", 'magenta')).strip()
         
         if ch == '1' and self.current_customer.has_checking:
             sender_account = "CHECKING"
         elif ch == '2' and self.current_customer.has_savings:
             sender_account = "SAVINGS"
         else:
-            print("Invalid choice.")
+            print(colored("Invalid choice.", 'red'))
             return
         
-        print(f"\nSelect {receiver.first_name}'s account to transfer to:")
+        print(colored(f"\nSelect {receiver.first_name}'s account to transfer to:",'magenta'))
         receiver_account = None
         if receiver.has_checking:
-            print(f"1. Checking Account (Balance: ${receiver.checking_balance:.2f})")
+            print(colored(f"1. Checking Account (Balance: ${receiver.checking_balance:.2f})",'green'))
         if receiver.has_savings:
-            print(f"2. Savings Account (Balance: ${receiver.savings_balance:.2f})")
+            print(colored(f"2. Savings Account (Balance: ${receiver.savings_balance:.2f})",'green'))
         
-        ch = input("Enter choice (1-2): ").strip()
+        ch = input(colored("Enter choice (1-2): ", 'magenta')).strip()
         
         if ch == '1' and receiver.has_checking:
             receiver_account = "CHECKING"
         elif ch == '2' and receiver.has_savings:
             receiver_account = "SAVINGS"
         else:
-            print("Invalid choice.")
+            print(colored("Invalid choice.", 'red'))
             return
         
         try:
-            amount = float(input("Enter amount to transfer: $"))
+            amount = float(input(colored("Enter amount to transfer: $", 'green')))
             if amount <= 0:
-                print("Amount must be positive.")
+                print(colored("Amount must be positive.", 'red'))
                 return
         except ValueError:
-            print("Invalid amount. Please enter a number.")
+            print(colored("Invalid amount. Please enter a number.", 'red'))
             return
         
-        print("\nTransfer Summary:")
-        print("From: {self.current_customer.first_name} {self.current_customer.last_name} ({sender_account})")
-        print("To: {receiver.first_name} {receiver.last_name} ({receiver_account})")
-        print("Amount: ${amount:.2f}")
+        print(colored("\nTransfer Summary:",'magenta'))
+        print(colored(f"From: {self.current_customer.first_name} {self.current_customer.last_name} ({sender_account})",'green'))
+        print(colored(f"To: {receiver.first_name} {receiver.last_name} ({receiver_account})",'green'))
+        print(colored(f"Amount: ${amount:.2f}",'green'))
         
-        confirm = input("Confirm transfer? (y/n): ").strip().lower()
+        confirm = input(colored("Confirm transfer? (y/n): ", 'magenta')).strip().lower()
         if confirm != 'y':
-            print("Transfer cancelled.")
+            print(colored("Transfer cancelled.", 'red'))
             return
         
         success, message = self.bank.transfer_between_customers(
@@ -299,16 +299,16 @@ class BankingMenu:
     
     def logout(self):
         self.current_customer = None
-        print("Logged out successfully.")
+        print(colored("Logged out successfully.", 'green'))
     
     def run(self):
-        print("Welcome to AHMED Bank")
+        print(colored("Welcome to AHMED Bank", 'blue'))
         
         while True:
             self.display_menu()
             
             if self.current_customer:
-                ch = input("Enter your choice (1-7): ").strip()
+                ch = input(colored("Enter your choice (1-7): ", 'magenta')).strip()
                 
                 if ch == '1':
                     self.view_account_info()
@@ -325,7 +325,7 @@ class BankingMenu:
                 elif ch == '7':
                     self.logout()
                 else:
-                    print("Invalid choice. Please try again.")
+                    print(colored("Invalid choice. Please try again.", 'red'))
             else:
                 ch = input(colored("Enter your choice (1-3): ", 'magenta')).strip()
                 
@@ -334,10 +334,10 @@ class BankingMenu:
                 elif ch == '2':
                     self.register()
                 elif ch == '3':
-                    print("Thank you for using AHMED Bank Goodbye!")
+                    print(colored("Thank you for using AHMED Bank Goodbye!", 'blue'))
                     break
                 else:
-                    print("Invalid choice. Please try again.")
+                    print(colored("Invalid choice. Please try again.", 'red'))
 
 def main():
     app = BankingMenu()
