@@ -1,216 +1,9 @@
 import csv
 import os
-from typing import Optional, Dict, Any
-from datetime import datetime
+from bank import Bank
 
-class Customer:
-        
-    def __init__(self, customer_id: str, first_name: str, last_name: str, password: str):
-        self.customer_id = customer_id
-        self.first_name = first_name
-        self.last_name = last_name
-        self.password = password
-        self.has_checking = False
-        self.has_savings = False
-        self.active = True
-        self.checking_balance = 0.0
-        self.savings_balance = 0.0
-        self.overdraft_count = 0
-        self.transaction_log = []
-    
-    def add_checking_account(self):
-        self.has_checking = True
-    
-    def add_savings_account(self):
-        self.has_savings = True
-    
-    def authenticate(self, password: str) -> bool:
-        return self.password == password and self.active
-    
-    def log_transaction(self, transaction_type: str, account_type: str, amount: float, 
-                       balance_after: float, description: str = ""):
-        
-        transaction = {
-            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            'type': transaction_type,
-            'account': account_type,
-            'amount': amount,
-            'balance_after': balance_after,
-            'description': description
-        }
-        self.transaction_log.append(transaction)
-    
-    def withdraw_from_checking(self, amount: float) -> tuple[bool, str]:
-        
-        if not self.has_checking:
-            return False, "No checking account available"
-        
-        if not self.active:
-            return False, "Account is deactivated"
-        
-        if amount > 100:
-            return False, "Cannot withdraw more than $100 in one transaction"
-        
-        if self.checking_balance - amount < -100:
-            return False, "Insufficient funds. Account cannot go below -$100"
-        
-        if self.checking_balance < 0 and amount > 100:
-            return False, "Cannot withdraw more than $100 when account balance is negative"
-        
-        self.checking_balance -= amount
-        
-        if self.checking_balance < 0:
-            self.checking_balance -= 35
-            self.overdraft_count += 1
-            self.log_transaction("WITHDRAWAL", "CHECKING", amount, self.checking_balance, 
-                               f"Withdrawal + $35 overdraft fee (Overdraft #{self.overdraft_count})")
-            
-            if self.overdraft_count >= 2:
-                self.active = False
-                return True, f"Withdrawal successful. Overdraft fee of $35 charged. Account deactivated due to {self.overdraft_count} overdrafts."
-            else:
-                return True, f"Withdrawal successful. Overdraft fee of $35 charged. (Overdraft #{self.overdraft_count})"
-        else:
-            self.log_transaction("WITHDRAWAL", "CHECKING", amount, self.checking_balance)
-            return True, "Withdrawal successful"
-    
-    def withdraw_from_savings(self, amount: float) -> tuple[bool, str]:
-        if not self.has_savings:
-            return False, "No savings account available"
-        
-        if not self.active:
-            return False, "Account is deactivated"
-        
-        if amount > 100:
-            return False, "Cannot withdraw more than $100 in one transaction"
-        
-        if self.savings_balance - amount < -100:
-            return False, "Insufficient funds. Account cannot go below -$100"
-        
-        if self.savings_balance < 0 and amount > 100:
-            return False, "Cannot withdraw more than $100 when account balance is negative"
-        
-        self.savings_balance -= amount
-        
-        if self.savings_balance < 0:
-            self.savings_balance -= 35
-            self.overdraft_count += 1
-            self.log_transaction("WITHDRAWAL", "SAVINGS", amount, self.savings_balance, 
-                               f"Withdrawal + $35 overdraft fee (Overdraft #{self.overdraft_count})")
-            
-            if self.overdraft_count >= 2:
-                self.active = False
-                return True, f"Withdrawal successful. Overdraft fee of $35 charged. Account deactivated due to {self.overdraft_count} overdrafts."
-            else:
-                return True, f"Withdrawal successful. Overdraft fee of $35 charged. (Overdraft #{self.overdraft_count})"
-        else:
-            self.log_transaction("WITHDRAWAL", "SAVINGS", amount, self.savings_balance)
-            return True, "Withdrawal successful"
-    
-    def deposit_to_checking(self, amount: float) -> bool:
-        if not self.has_checking:
-            return False
-        
-        self.checking_balance += amount
-        self.log_transaction("DEPOSIT", "CHECKING", amount, self.checking_balance)
-        
-        if not self.active and self.checking_balance >= 0:
-            self.active = True
-            self.overdraft_count = 0
-        
-        return True
-    
-    def deposit_to_savings(self, amount: float) -> bool:
-        if not self.has_savings:
-            return False
-        
-        self.savings_balance += amount
-        self.log_transaction("DEPOSIT", "SAVINGS", amount, self.savings_balance)
-        
-        if not self.active and self.savings_balance >= 0:
-            self.active = True
-            self.overdraft_count = 0
-        
-        return True
-    
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            'id': self.customer_id,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'password': self.password,
-            'has_checking': self.has_checking,
-            'has_savings': self.has_savings,
-            'active': self.active,
-            'checking_balance': self.checking_balance,
-            'savings_balance': self.savings_balance,
-            'overdraft_count': self.overdraft_count
-        }
 
-class Bank:    
-    def __init__(self, csv_file: str = "bank.csv"):
-        self.csv_file = csv_file
-        self.customers = {}
-        self.load_customers()
-    
-    def load_customers(self):
-        if not os.path.exists(self.csv_file):
-            return
-        
-        with open(self.csv_file, 'r', newline='') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                customer_id = row['id']
-                customer = Customer(
-                    customer_id,
-                    row['first_name'],
-                    row['last_name'],
-                    row['password']
-                )
-                customer.has_checking = row.get('has_checking', 'False').lower() == 'true'
-                customer.has_savings = row.get('has_savings', 'False').lower() == 'true'
-                customer.active = row.get('active', 'True').lower() == 'true'
-                customer.checking_balance = float(row.get('checking_balance', '0'))
-                customer.savings_balance = float(row.get('savings_balance', '0'))
-                customer.overdraft_count = int(row.get('overdraft_count', '0'))
-                
-                self.customers[customer_id] = customer
-    
-    def save_customers(self):
-        with open(self.csv_file, 'w', newline='') as file:
-            fieldnames = ['id', 'first_name', 'last_name', 'password', 'has_checking', 'has_savings', 'active', 'checking_balance', 'savings_balance', 'overdraft_count']
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
-            writer.writeheader()
-            
-            for customer in self.customers.values():
-                writer.writerow(customer.to_dict())
-    
-    def add_customer(self, first_name: str, last_name: str, password: str, 
-                    checking: bool = False, savings: bool = False) -> str:
-        customer_id = str(10000 + len(self.customers) + 1)
-        
-        customer = Customer(customer_id, first_name, last_name, password)
-        
-        if checking:
-            customer.add_checking_account()
-        
-        if savings:
-            customer.add_savings_account()
-        
-        self.customers[customer_id] = customer
-        self.save_customers()
-        return customer_id
-    
-    def get_customer(self, customer_id: str) -> Optional[Customer]:
-        return self.customers.get(customer_id)
-    
-    def authenticate_customer(self, customer_id: str, password: str) -> Optional[Customer]:
-        customer = self.get_customer(customer_id)
-        if customer and customer.authenticate(password):
-            return customer
-        return None
-
-class BankingSys:
+class BankingMenu:
     
     def __init__(self):
         self.bank = Bank()
@@ -228,7 +21,8 @@ class BankingSys:
             print("3. Add Savings Account")
             print("4. Withdraw Money")
             print("5. Deposit Money")
-            print("6. Logout")
+            print("6. Transfer Money")
+            print("7. Logout")
         else:
             print("\n1. Login")
             print("2. Register New Customer")
@@ -238,10 +32,10 @@ class BankingSys:
     
     def login(self):
         print("\nCUSTOMER LOGIN")
-        customer_id = input("Enter Customer ID: ").strip()
+        cust_id = input("Enter Customer ID: ").strip()
         password = input("Enter Password: ").strip()
         
-        customer = self.bank.authenticate_customer(customer_id, password)
+        customer = self.bank.auth_customer(cust_id, password)
         if customer:
             self.current_customer = customer
             print(f"Login successful! Welcome, {customer.first_name}!")
@@ -260,19 +54,19 @@ class BankingSys:
         print("3. Both checking and savings")
         print("4. No accounts (add later)")
         
-        choice = input("Select account type (1-4): ").strip()
+        ch = input("Select account type (1-4): ").strip()
         
-        checking = choice in ['1', '3']
-        savings = choice in ['2', '3']
+        checking = ch in ['1', '3']
+        savings = ch in ['2', '3']
         
-        customer_id = self.bank.add_customer(first_name, last_name, password, checking, savings)
-        print(f"Registration successful! Your Customer ID is: {customer_id}")
+        cust_id = self.bank.add_customer(first_name, last_name, password, checking, savings)
+        print(f"Registration successful! Your Customer ID is: {cust_id}")
         print("Please login to access your account.")
     
     def view_account_info(self):
         print("\nACCOUNT INFORMATION")
         print("-" * 30)
-        print(f"Customer ID: {self.current_customer.customer_id}")
+        print(f"Customer ID: {self.current_customer.cust_id}")
         print(f"Name: {self.current_customer.first_name} {self.current_customer.last_name}")
         print(f"Checking Account: {'Yes' if self.current_customer.has_checking else 'No'}")
         if self.current_customer.has_checking:
@@ -318,7 +112,7 @@ class BankingSys:
         if self.current_customer.has_savings:
             print(f"2. Savings Account (Balance: ${self.current_customer.savings_balance:.2f})")
         
-        choice = input("Enter choice (1-2): ").strip()
+        ch = input("Enter choice (1-2): ").strip()
         
         try:
             amount = float(input("Enter amount to withdraw: $"))
@@ -329,12 +123,12 @@ class BankingSys:
             print("Invalid amount. Please enter a number.")
             return
         
-        if choice == '1' and self.current_customer.has_checking:
+        if ch == '1' and self.current_customer.has_checking:
             success, message = self.current_customer.withdraw_from_checking(amount)
             print(message)
             if success:
                 self.bank.save_customers()
-        elif choice == '2' and self.current_customer.has_savings:
+        elif ch == '2' and self.current_customer.has_savings:
             success, message = self.current_customer.withdraw_from_savings(amount)
             print(message)
             if success:
@@ -355,7 +149,7 @@ class BankingSys:
         if self.current_customer.has_savings:
             print(f"2. Savings Account (Balance: ${self.current_customer.savings_balance:.2f})")
         
-        choice = input("Enter choice (1-2): ").strip()
+        ch = input("Enter choice (1-2): ").strip()
         
         try:
             amount = float(input("Enter amount to deposit: $"))
@@ -366,14 +160,14 @@ class BankingSys:
             print("Invalid amount. Please enter a number.")
             return
         
-        if choice == '1' and self.current_customer.has_checking:
+        if ch == '1' and self.current_customer.has_checking:
             success = self.current_customer.deposit_to_checking(amount)
             if success:
                 print("Deposit successful!")
                 self.bank.save_customers()
             else:
                 print("Deposit failed.")
-        elif choice == '2' and self.current_customer.has_savings:
+        elif ch == '2' and self.current_customer.has_savings:
             success = self.current_customer.deposit_to_savings(amount)
             if success:
                 print("Deposit successful!")
@@ -382,6 +176,128 @@ class BankingSys:
                 print("Deposit failed.")
         else:
             print("Invalid choice.")
+    
+    def transfer_money(self):
+        print("\nTRANSFER MONEY")
+        print("1. Transfer between your own accounts")
+        print("2. Transfer to another customer")
+        
+        ch = input("Enter choice (1-2): ").strip()
+        
+        if ch == '1':
+            self.internal_transfer()
+        elif ch == '2':
+            self.external_transfer()
+        else:
+            print("Invalid choice.")
+    
+    def internal_transfer(self):
+        if not self.current_customer.has_checking or not self.current_customer.has_savings:
+            print("You need both checking and savings accounts to transfer between them.")
+            return
+        
+        print("\nSelect transfer direction:")
+        print(f"1. Savings to Checking (Savings Balance: ${self.current_customer.savings_balance:.2f})")
+        print(f"2. Checking to Savings (Checking Balance: ${self.current_customer.checking_balance:.2f})")
+        
+        ch = input("Enter choice (1-2): ").strip()
+        
+        try:
+            amount = float(input("Enter amount to transfer: $"))
+            if amount <= 0:
+                print("Amount must be positive.")
+                return
+        except ValueError:
+            print("Invalid amount. Please enter a number.")
+            return
+        
+        if ch == '1':
+            success, message = self.current_customer.transfer_to_checking(amount)
+            print(message)
+            if success:
+                self.bank.save_customers()
+        elif ch == '2':
+            success, message = self.current_customer.transfer_to_savings(amount)
+            print(message)
+            if success:
+                self.bank.save_customers()
+        else:
+            print("Invalid choice.")
+    
+    def external_transfer(self):
+        if not self.current_customer.has_checking and not self.current_customer.has_savings:
+            print("No accounts available for transfer.")
+            return
+        
+        receiver_id = input("Enter receiver's Customer ID: ").strip()
+        receiver = self.bank.get_customer(receiver_id)
+        
+        if not receiver:
+            print("Receiver customer not found.")
+            return
+        
+        if not receiver.active:
+            print("Receiver account is deactivated.")
+            return
+        
+        print("\nSelect your account to transfer from:")
+        sender_account = None
+        if self.current_customer.has_checking:
+            print(f"1. Checking Account (Balance: ${self.current_customer.checking_balance:.2f})")
+        if self.current_customer.has_savings:
+            print(f"2. Savings Account (Balance: ${self.current_customer.savings_balance:.2f})")
+        
+        ch = input("Enter choice (1-2): ").strip()
+        
+        if ch == '1' and self.current_customer.has_checking:
+            sender_account = "CHECKING"
+        elif ch == '2' and self.current_customer.has_savings:
+            sender_account = "SAVINGS"
+        else:
+            print("Invalid choice.")
+            return
+        
+        print(f"\nSelect {receiver.first_name}'s account to transfer to:")
+        receiver_account = None
+        if receiver.has_checking:
+            print(f"1. Checking Account (Balance: ${receiver.checking_balance:.2f})")
+        if receiver.has_savings:
+            print(f"2. Savings Account (Balance: ${receiver.savings_balance:.2f})")
+        
+        ch = input("Enter choice (1-2): ").strip()
+        
+        if ch == '1' and receiver.has_checking:
+            receiver_account = "CHECKING"
+        elif ch == '2' and receiver.has_savings:
+            receiver_account = "SAVINGS"
+        else:
+            print("Invalid choice.")
+            return
+        
+        try:
+            amount = float(input("Enter amount to transfer: $"))
+            if amount <= 0:
+                print("Amount must be positive.")
+                return
+        except ValueError:
+            print("Invalid amount. Please enter a number.")
+            return
+        
+        print(f"\nTransfer Summary:")
+        print(f"From: {self.current_customer.first_name} {self.current_customer.last_name} ({sender_account})")
+        print(f"To: {receiver.first_name} {receiver.last_name} ({receiver_account})")
+        print(f"Amount: ${amount:.2f}")
+        
+        confirm = input("Confirm transfer? (y/n): ").strip().lower()
+        if confirm != 'y':
+            print("Transfer cancelled.")
+            return
+        
+        success, message = self.bank.transfer_between_customers(
+            self.current_customer.cust_id, receiver_id, 
+            sender_account, receiver_account, amount
+        )
+        print(message)
     
     def logout(self):
         self.current_customer = None
@@ -394,37 +310,39 @@ class BankingSys:
             self.display_menu()
             
             if self.current_customer:
-                choice = input("Enter your choice (1-6): ").strip()
+                ch = input("Enter your choice (1-7): ").strip()
                 
-                if choice == '1':
+                if ch == '1':
                     self.view_account_info()
-                elif choice == '2':
+                elif ch == '2':
                     self.add_checking_account()
-                elif choice == '3':
+                elif ch == '3':
                     self.add_savings_account()
-                elif choice == '4':
+                elif ch == '4':
                     self.withdraw_money()
-                elif choice == '5':
+                elif ch == '5':
                     self.deposit_money()
-                elif choice == '6':
+                elif ch == '6':
+                    self.transfer_money()
+                elif ch == '7':
                     self.logout()
                 else:
                     print("Invalid choice. Please try again.")
             else:
-                choice = input("Enter your choice (1-3): ").strip()
+                ch = input("Enter your choice (1-3): ").strip()
                 
-                if choice == '1':
+                if ch == '1':
                     self.login()
-                elif choice == '2':
+                elif ch == '2':
                     self.register()
-                elif choice == '3':
+                elif ch == '3':
                     print("Thank you for using AHMED Bank Goodbye!")
                     break
                 else:
                     print("Invalid choice. Please try again.")
 
 def main():
-    app = BankingSys()
+    app = BankingMenu()
     app.run()
 
 if __name__ == "__main__":

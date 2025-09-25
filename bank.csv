@@ -10,6 +10,6 @@ id,first_name,last_name,password,has_checking,has_savings,active,checking_balanc
 10009,Stacey,Abrams,!fiuenrg,False,True,True,0.0,0.0,0
 100010,Jake,Paul,wegtr,True,True,True,0.0,0.0,0
 100011,rtg,drg,2435365,True,False,True,0.0,0.0,0
-100012,Devlin,Booth,123456,False,True,True,0.0,0.0,0
-10013,Ahmed,Hattan,A12345@,True,True,True,0.0,900.0,0
-10014,Khalid,Alduwaysan,123,True,True,True,0.0,0.0,0
+100012,Devlin,Booth,123456,False,True,True,0.0,-135.0,1
+10013,Ahmed,Hattan,A12345@,True,True,True,0.0,500.0,0
+10014,Khalid,Alduwaysan,123,True,True,True,200.0,200.0,0
