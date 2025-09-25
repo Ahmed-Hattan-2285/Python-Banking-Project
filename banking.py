@@ -1,7 +1,5 @@
-import csv
-import os
 from bank import Bank
-
+from termcolor import colored, cprint
 
 class BankingMenu:
     
@@ -10,51 +8,51 @@ class BankingMenu:
         self.current_customer = None
     
     def display_menu(self):
-        print("\n" + "="*50)
-        print("WELCOME TO AHMED BANK")
-        print("="*50)
+        print(colored("\n" + "="*100, 'yellow'))
+        print (colored("WELCOME TO AHMED BANK", 'cyan', attrs=['bold']))
+        print(colored("="*100,'yellow'))
         
         if self.current_customer:
-            print(f"Welcome, {self.current_customer.first_name} {self.current_customer.last_name}!")
-            print("\n1. View Account Information")
-            print("2. Add Checking Account")
-            print("3. Add Savings Account")
-            print("4. Withdraw Money")
-            print("5. Deposit Money")
-            print("6. Transfer Money")
-            print("7. Logout")
+            print (colored(f"Welcome, {self.current_customer.first_name} {self.current_customer.last_name}!", 'green'))
+            print(colored("\n1. View Account Information", 'yellow'))
+            print(colored("2. Add Checking Account",'blue'))
+            print(colored("3. Add Savings Account",'blue'))
+            print(colored("4. Withdraw Money",'blue'))
+            print(colored("5. Deposit Money",'blue'))
+            print(colored("6. Transfer Money",'blue'))
+            print(colored("7. Logout", 'red'))
         else:
-            print("\n1. Login")
-            print("2. Register New Customer")
-            print("3. Exit")
+            print(colored("\n1. Login",'blue'))
+            print(colored("2. Register New Customer",'blue'))
+            print(colored("3. Exit",'red'))
         
-        print("="*50)
+        print(colored("="*100,'yellow'))
     
     def login(self):
-        print("\nCUSTOMER LOGIN")
-        cust_id = input("Enter Customer ID: ").strip()
-        password = input("Enter Password: ").strip()
+        print(colored("\nCUSTOMER LOGIN",'blue'))
+        cust_id = input(colored("Enter Customer ID: ", 'green')).strip()
+        password = input(colored("Enter Password: ", 'red')).strip()
         
         customer = self.bank.auth_customer(cust_id, password)
         if customer:
             self.current_customer = customer
-            print(f"Login successful! Welcome, {customer.first_name}!")
+            print(colored(f"Login successful! Welcome, {customer.first_name}!", 'green'))
         else:
-            print("Invalid credentials or account deactivated.")
+            print(colored("Invalid credentials or account deactivated.", 'red'))
     
     def register(self):
-        print("\nNEW CUSTOMER REGISTRATION")
-        first_name = input("Enter First Name: ").strip()
-        last_name = input("Enter Last Name: ").strip()
-        password = input("Enter Password: ").strip()
+        print(colored("\nNEW CUSTOMER REGISTRATION",'blue'))
+        first_name = input(colored("Enter First Name: ", 'green')).strip()
+        last_name = input(colored("Enter Last Name: ",'green')).strip()
+        password = input(colored("Enter Password: ", 'red')).strip()
         
-        print("\nAccount Types:")
-        print("1. Checking only")
-        print("2. Savings only")
-        print("3. Both checking and savings")
-        print("4. No accounts (add later)")
+        print(colored("\nAccount Types:",'magenta'))
+        print(colored("1. Checking only",'blue'))
+        print(colored("2. Savings only",'blue'))
+        print(colored("3. Both checking and savings",'blue'))
+        print(colored("4. No accounts (add later)",'blue'))
         
-        ch = input("Select account type (1-4): ").strip()
+        ch = input(colored("Select account type (1-4): ", 'green')).strip()
         
         checking = ch in ['1', '3']
         savings = ch in ['2', '3']
@@ -64,8 +62,8 @@ class BankingMenu:
         print("Please login to access your account.")
     
     def view_account_info(self):
-        print("\nACCOUNT INFORMATION")
-        print("-" * 30)
+        print(colored("\nACCOUNT INFORMATION",'blue'))
+        print(colored("-" * 30, 'yellow'))
         print(f"Customer ID: {self.current_customer.cust_id}")
         print(f"Name: {self.current_customer.first_name} {self.current_customer.last_name}")
         print(f"Checking Account: {'Yes' if self.current_customer.has_checking else 'No'}")
@@ -112,15 +110,15 @@ class BankingMenu:
         if self.current_customer.has_savings:
             print(f"2. Savings Account (Balance: ${self.current_customer.savings_balance:.2f})")
         
-        ch = input("Enter choice (1-2): ").strip()
+        ch = input(colored("Enter choice (1-2): ",'magenta')).strip()
         
         try:
-            amount = float(input("Enter amount to withdraw: $"))
+            amount = float(input(colored("Enter amount to withdraw: $",'green')))
             if amount <= 0:
-                print("Amount must be positive.")
+                print(colored("Amount must be positive.",'red'))
                 return
         except ValueError:
-            print("Invalid amount. Please enter a number.")
+            print(colored("Invalid amount. Please enter a number.",'red'))
             return
         
         if ch == '1' and self.current_customer.has_checking:
@@ -283,10 +281,10 @@ class BankingMenu:
             print("Invalid amount. Please enter a number.")
             return
         
-        print(f"\nTransfer Summary:")
-        print(f"From: {self.current_customer.first_name} {self.current_customer.last_name} ({sender_account})")
-        print(f"To: {receiver.first_name} {receiver.last_name} ({receiver_account})")
-        print(f"Amount: ${amount:.2f}")
+        print("\nTransfer Summary:")
+        print("From: {self.current_customer.first_name} {self.current_customer.last_name} ({sender_account})")
+        print("To: {receiver.first_name} {receiver.last_name} ({receiver_account})")
+        print("Amount: ${amount:.2f}")
         
         confirm = input("Confirm transfer? (y/n): ").strip().lower()
         if confirm != 'y':
@@ -329,7 +327,7 @@ class BankingMenu:
                 else:
                     print("Invalid choice. Please try again.")
             else:
-                ch = input("Enter your choice (1-3): ").strip()
+                ch = input(colored("Enter your choice (1-3): ", 'magenta')).strip()
                 
                 if ch == '1':
                     self.login()

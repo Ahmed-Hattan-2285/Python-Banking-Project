@@ -12,4 +12,7 @@ id,first_name,last_name,password,has_checking,has_savings,active,checking_balanc
 100011,rtg,drg,2435365,True,False,True,0.0,0.0,0
 100012,Devlin,Booth,123456,False,True,True,0.0,-135.0,1
 10013,Ahmed,Hattan,A12345@,True,True,True,0.0,500.0,0
-10014,Khalid,Alduwaysan,123,True,True,True,200.0,200.0,0
+10014,Khalid,Alduwaysan,123,True,True,True,400.0,200.0,0
+10015,Ali,Ahmed,123,True,True,True,0.0,-135.0,1
+10016,Mohammed,Ali,123,True,False,True,500.0,0.0,0
+10017,Aaa,Haa,123,False,False,True,0.0,0.0,0

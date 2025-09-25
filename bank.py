@@ -1,7 +1,7 @@
 import csv
 import os
 from customer import Customer
-from typing import Optional, Dict, Any
+from typing import Optional
 
 class Bank:    
     def __init__(self, csv_file: str = "bank.csv"):

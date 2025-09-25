@@ -1,6 +1,5 @@
 from transaction import Transaction
-from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Dict, Any
 
 
 class Customer:
@@ -143,9 +142,9 @@ class Customer:
         self.checking_balance += amount
         
         self.log_transaction("TRANSFER_OUT", "SAVINGS", amount, self.savings_balance, 
-                           f"Transfer to checking account")
+                           "Transfer to checking account")
         self.log_transaction("TRANSFER_IN", "CHECKING", amount, self.checking_balance, 
-                           f"Transfer from savings account")
+                           "Transfer from savings account")
         
         return True, "Transfer successful"
     
@@ -166,9 +165,9 @@ class Customer:
         self.savings_balance += amount
         
         self.log_transaction("TRANSFER_OUT", "CHECKING", amount, self.checking_balance, 
-                           f"Transfer to savings account")
+                           "Transfer to savings account")
         self.log_transaction("TRANSFER_IN", "SAVINGS", amount, self.savings_balance, 
-                           f"Transfer from checking account")
+                           "Transfer from checking account")
         
         return True, "Transfer successful"
     

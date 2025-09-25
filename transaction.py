@@ -1,6 +1,5 @@
 from datetime import datetime
-from typing import Optional, Dict, Any
-
+from typing import Dict, Any
 
 class Transaction:    
     def __init__(self, transaction_type: str, account_type: str, amount: float, 
