@@ -14,12 +14,12 @@
 <p align="center">
   A comprehensive command-line banking application built with Python
   <br />
-  <a href="https://github.com/ahmedhattan/python-banking-project"><strong>Explore the docs »</strong></a>
+  <a href="https://github.com/Ahmed-Hattan-2285/Python-Banking-Project"><strong>Explore the docs »</strong></a>
   <br />
   <br />
-  <a href="https://github.com/ahmedhattan/python-banking-project/issues">Report Bug</a>
+  <a href="https://github.com/Ahmed-Hattan-2285/Python-Banking-Project/issues">Report Bug</a>
   ·
-  <a href="https://github.com/ahmedhattan/python-banking-project/issues">Request Feature</a>
+  <a href="https://github.com/Ahmed-Hattan-2285/Python-Banking-Project/issues">Request Feature</a>
 </p>
 </div>
 
@@ -75,6 +75,7 @@ The system implements realistic banking rules including withdrawal limits, overd
 
 | Technology | Purpose | Version |
 |------------|---------|---------|
+| **VSCode** | Code Editor | 1.70.3.8+ |
 | **Python** | Core programming language | 3.8+ |
 | **CSV Module** | Data persistence and storage | Built-in |
 | **TermColor** | Terminal text coloring | Latest |
@@ -231,7 +232,7 @@ termcolor>=2.0.0  # For colored terminal output
 
 ### Usage
 
-1. **Start the application** by running `python banking.py`
+1. **Start the application** by running `python3 banking.py`
 2. **Register a new customer** or **login** with existing credentials
 3. **Navigate the menu** using the numbered options
 4. **Perform banking operations** like deposits, withdrawals, and transfers
